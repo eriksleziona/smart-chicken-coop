@@ -37,17 +37,21 @@ class MQTTController:
         )
         self.connected = False
 
+    def _on_message(self, topic, msg):
+        self.handle_incoming(topic, msg)
+
     def connect(self):
         try:
-            self.client.connect()
-            self.connected = True
-            self.logger.info("Connected to MQTT broker at %s" % MQTT_BROKER)
             self.client.set_last_will(
                 MQTT_BASE_TOPIC + "/system/availability",
                 "offline",
                 retain=True,
                 qos=0,
             )
+            self.client.set_callback(self._on_message)
+            self.client.connect()
+            self.connected = True
+            self.logger.info("Connected to MQTT broker at %s" % MQTT_BROKER)
             self.publish(MQTT_BASE_TOPIC + "/system/availability", "online", retain=True)
             self.publish_discovery()
             return True

@@ -24,22 +24,30 @@ logger = Logger("MAIN")
 
 
 def on_mqtt_message(topic, message):
+    if isinstance(message, bytes):
+        message = message.decode("utf-8", "ignore")
     logger.info("MQTT message on %s: %s" % (topic, message))
+    payload = str(message).strip().lower()
+
     if topic.endswith("ventilation/command"):
-        if message in (b"on", b"1"):
+        if payload in ("on", "1", "true", "enable"):
             logger.info("Manual ventilation enabled")
         else:
             logger.info("Manual ventilation disabled")
+
     if topic.endswith("lighting/command"):
-        if message in (b"on", b"1"):
+        if payload in ("on", "1", "true", "enable"):
             logger.info("Manual lighting enabled")
         else:
             logger.info("Manual lighting disabled")
+
     if topic.endswith("door/command"):
-        if message in (b"open", b"OPEN"):
+        if payload in ("open", "open_door"):
             logger.info("Door command: open")
-        elif message in (b"close", b"CLOSE"):
+        elif payload in ("close", "close_door"):
             logger.info("Door command: close")
+        elif payload in ("stop", "stop_door"):
+            logger.info("Door command: stop")
 
 
 def publish_telemetry(mqtt, env, feeder, water, vent_state, lighting_state, door_state, health):
