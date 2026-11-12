@@ -11,6 +11,7 @@ from config import (
     MQTT_PASSWORD,
     MQTT_CLIENT_ID,
     MQTT_BASE_TOPIC,
+    MQTT_DISCOVERY_PREFIX,
     MQTT_KEEPALIVE_S,
 )
 
@@ -47,12 +48,8 @@ class MQTTController:
                 retain=True,
                 qos=0,
             )
-            self.client.publish(
-                MQTT_BASE_TOPIC + "/system/availability",
-                "online",
-                retain=True,
-                qos=0,
-            )
+            self.publish(MQTT_BASE_TOPIC + "/system/availability", "online", retain=True)
+            self.publish_discovery()
             return True
         except Exception as exc:
             self.logger.error("MQTT connect failed: %s" % str(exc))
@@ -61,18 +58,70 @@ class MQTTController:
 
     def subscribe(self, topic):
         if self.connected:
-            self.client.subscribe(topic)
+            try:
+                self.client.subscribe(topic)
+            except Exception as exc:
+                self.logger.warn("MQTT subscribe failed for %s: %s" % (topic, str(exc)))
 
     def publish(self, topic, payload, retain=False):
         if self.connected:
             try:
-                self.client.publish(topic, payload, retain=retain, qos=0)
+                self.client.publish(topic, str(payload), retain=retain, qos=0)
             except Exception as exc:
                 self.logger.warn("MQTT publish failed for %s: %s" % (topic, str(exc)))
                 self.connected = False
 
     def publish_json(self, topic, data, retain=False):
         self.publish(topic, json.dumps(data), retain=retain)
+
+    def publish_discovery(self):
+        discovery = MQTT_DISCOVERY_PREFIX
+        device = {
+            "identifiers": [MQTT_CLIENT_ID],
+            "name": "Smart Chicken Coop",
+            "model": "ESP32-based poultry controller",
+            "manufacturer": "Custom",
+        }
+        payloads = [
+            {
+                "name": "Chicken Coop Temperature",
+                "state_topic": MQTT_BASE_TOPIC + "/environment/temperature",
+                "unit_of_measurement": "°C",
+                "device_class": "temperature",
+                "unique_id": MQTT_CLIENT_ID + "_temperature",
+                "device": device,
+                "availability_topic": MQTT_BASE_TOPIC + "/system/availability",
+            },
+            {
+                "name": "Chicken Coop Humidity",
+                "state_topic": MQTT_BASE_TOPIC + "/environment/humidity",
+                "unit_of_measurement": "%",
+                "device_class": "humidity",
+                "unique_id": MQTT_CLIENT_ID + "_humidity",
+                "device": device,
+                "availability_topic": MQTT_BASE_TOPIC + "/system/availability",
+            },
+            {
+                "name": "Chicken Coop CO2",
+                "state_topic": MQTT_BASE_TOPIC + "/environment/co2",
+                "unit_of_measurement": "ppm",
+                "device_class": "carbon_dioxide",
+                "unique_id": MQTT_CLIENT_ID + "_co2",
+                "device": device,
+                "availability_topic": MQTT_BASE_TOPIC + "/system/availability",
+            },
+            {
+                "name": "Chicken Coop Ventilation",
+                "state_topic": MQTT_BASE_TOPIC + "/ventilation/state",
+                "command_topic": MQTT_BASE_TOPIC + "/ventilation/command",
+                "unique_id": MQTT_CLIENT_ID + "_ventilation",
+                "device": device,
+                "availability_topic": MQTT_BASE_TOPIC + "/system/availability",
+            },
+        ]
+        for item in payloads:
+            topic = "%s/sensor/%s/config" % (discovery, item["unique_id"])
+            self.publish_json(topic, item, retain=True)
 
     def loop(self):
         if self.connected:
@@ -84,6 +133,8 @@ class MQTTController:
 
     def handle_incoming(self, topic, msg):
         if self.callback is not None:
+            if isinstance(msg, bytes):
+                msg = msg.decode("utf-8", "ignore")
             self.callback(topic, msg)
 
     def disconnect(self):

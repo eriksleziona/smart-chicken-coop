@@ -15,7 +15,9 @@ MQTT_USERNAME = ""
 MQTT_PASSWORD = ""
 MQTT_CLIENT_ID = "smart_chicken_coop_esp32"
 MQTT_BASE_TOPIC = "chicken_coop"
+MQTT_DISCOVERY_PREFIX = "homeassistant"
 MQTT_KEEPALIVE_S = 60
+MQTT_RETRY_DELAY_S = 5
 
 # ESP32 GPIO assignments
 # These are realistic default mappings for a development board. Final pin allocation

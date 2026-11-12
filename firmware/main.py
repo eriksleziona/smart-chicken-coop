@@ -83,9 +83,20 @@ def run():
         try:
             if not wifi_connected:
                 wifi_connected = wifi.connect()
+                if not wifi_connected:
+                    utime.sleep(2)
+                    continue
 
             if wifi_connected and not mqtt_connected:
                 mqtt_connected = mqtt.connect()
+                if mqtt_connected:
+                    mqtt.subscribe(MQTT_BASE_TOPIC + "/ventilation/command")
+                    mqtt.subscribe(MQTT_BASE_TOPIC + "/lighting/command")
+                    mqtt.subscribe(MQTT_BASE_TOPIC + "/door/command")
+                else:
+                    if wifi.is_connected():
+                        wifi.reconnect()
+                    wifi_connected = False
 
             env_temp = sensors.read_temperature_humidity()
             env_co2 = sensors.read_co2()
@@ -119,5 +130,8 @@ def run():
 
         except Exception as exc:
             logger.error("Runtime error: %s" % str(exc))
+            if not wifi.is_connected():
+                wifi_connected = False
+            mqtt_connected = False
 
         utime.sleep(2)
