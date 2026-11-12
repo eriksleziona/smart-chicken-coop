@@ -1,7 +1,9 @@
 # Mechanical ventilation controller with local fail-safe logic.
+# This controller is intentionally local-first: it keeps the animal-safe
+# ventilation strategy working even when MQTT or Home Assistant are unavailable.
 
 import utime
-from machine import Pin, PWM
+from machine import Pin
 
 from config import ENVIRONMENT_THRESHOLDS
 
@@ -14,13 +16,15 @@ class VentilationController:
         self.target_pct = 0
         self.mode = "idle"
         self.manual_override = False
+        self.last_change_ms = 0
 
     def set_manual_override(self, enabled):
         self.manual_override = enabled
 
     def update(self, temperature_c, humidity_pct, co2_ppm, ammonia_ppm, mqtt_connected):
         thresholds = ENVIRONMENT_THRESHOLDS
-        # Local emergency logic takes precedence over MQTT or HA state.
+
+        # Hysteresis and local safety remain ahead of external logic.
         if ammonia_ppm >= thresholds["ammonia_critical_ppm"]:
             self.target_pct = thresholds["max_ventilation_pct"]
             self.mode = "emergency"
@@ -60,3 +64,8 @@ class VentilationController:
     def apply(self):
         self.fan_pin.value(1 if self.target_pct > 0 else 0)
         return self.target_pct
+
+    def enable_emergency(self):
+        self.target_pct = ENVIRONMENT_THRESHOLDS["max_ventilation_pct"]
+        self.mode = "emergency"
+        self.apply()
