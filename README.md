@@ -1,8 +1,16 @@
-# Smart Chicken Coop – Architecture and implementation scaffold
+# Smart Chicken Coop – Architecture, planning and ESP32 firmware
 
-This repository captures the design and implementation foundation for an intelligent laying-hen coop based on the project brief. The first phase defined the system requirements, architecture, ventilation concept, preliminary hardware shortlist and missing-data checklist. The design was accepted, and the second phase introduces the ESP32 firmware module skeleton for the controller.
+This repository captures the design and implementation foundation for an intelligent laying-hen coop based on the project brief.
 
-The project now contains the architecture documentation and the initial implementation-ready MicroPython module structure.
+The project combines:
+
+- mechanical ventilation based on house volume, flock density and environmental control,
+- ESP32-based local automation written in MicroPython,
+- MQTT communication to Mosquitto,
+- Home Assistant supervision,
+- fail-safe operation that remains functional without Wi‑Fi or MQTT availability.
+
+The repository currently contains both the architectural design stage and the first working firmware implementation scaffold for the controller.
 
 ## 1. Project summary
 
@@ -29,35 +37,85 @@ The project now contains the architecture documentation and the initial implemen
 6. Reasonable cost
 7. Expandability
 
-## 3. Scope of this phase
+## 3. Scope covered in this repository
 
-This repository includes the initial design stage required by the brief:
+The project includes:
 
-- analysis of requirements
+- requirement analysis
 - system architecture
-- preliminary hardware shortlist
-- ventilation concept
+- preliminary hardware selection
+- ventilation concept and local safety strategy
 - block-level wiring concept
-- repository structure for the full project
-- list of open questions and missing measurements
+- repository structure for deployment and future expansion
+- first working MicroPython modules for ESP32
+- MQTT connectivity strategy with HA-ready discovery
+- lighting, ventilation, door and monitoring logic references
 
-## 4. Current status
+## 4. Firmware status
 
-The system is not yet implemented in firmware. This repository stores the architecture and planning foundations for the next phase.
+The firmware exists as a modular baseline and is intentionally local-first. The system keeps critical decisions inside the ESP32, with MQTT and Home Assistant acting as an optional supervisory layer rather than the primary safety control layer.
+
+The current implementation includes modules for:
+
+- Wi‑Fi handling and reconnect
+- MQTT broker connection and discovery
+- sensor reading for temperature, humidity, CO₂ and ammonia-related analog input
+- local ventilation logic with emergency behaviour
+- door control and obstacle-safe logic
+- lighting schedule logic
+- feeder and water anomaly monitoring
+- safety aggregation and diagnostic state
 
 ## 5. Key files
 
-- [requirements.md](./requirements.md) – detailed requirement analysis and missing-data checklist
+- [requirements.md](./requirements.md) – requirement analysis and missing-data checklist
 - [hardware/hardware_list.md](./hardware/hardware_list.md) – preliminary hardware shortlist
 - [hardware/wiring_diagram.md](./hardware/wiring_diagram.md) – high-level connection concept
 - [hardware/pinout.md](./hardware/pinout.md) – preliminary ESP32 pin planning
 - [hardware/electrical_safety.md](./hardware/electrical_safety.md) – safety guidelines
 - [documentation/system_architecture.md](./documentation/system_architecture.md) – architecture overview
-- [documentation/automation_logic.md](./documentation/automation_logic.md) – initial automation logic concept
-- [documentation/calibration.md](./documentation/calibration.md) – required calibration workflow
-- [home_assistant/mqtt_entities.yaml](./home_assistant/mqtt_entities.yaml) – MQTT topic and Home Assistant discovery template
-- [tests/](./tests) – validation plan for sensors, connectivity and failure modes
+- [documentation/automation_logic.md](./documentation/automation_logic.md) – automation logic concept
+- [documentation/calibration.md](./documentation/calibration.md) – calibration workflow
+- [documentation/troubleshooting.md](./documentation/troubleshooting.md) – failure and service checks
+- [firmware/README.md](./firmware/README.md) – MicroPython firmware overview
+- [home_assistant/mqtt_entities.yaml](./home_assistant/mqtt_entities.yaml) – MQTT topic and HA discovery template
+- [tests/](./tests) – validation plans for sensors, connectivity and failure modes
 
-## 6. Acceptance gate
+## 6. Missing data and open points
 
-The design must be accepted before full firmware implementation begins. The next step is to review and approve the architecture, hardware selection direction, and missing assumptions. Once approved, the implementation will proceed module by module.
+Before final production deployment, the following should be confirmed on site:
+
+- actual coop orientation and exposure to sun and wind
+- final inlet and exhaust geometry
+- local outdoor climate and winter conditions
+- litter and manure handling method
+- exact layout of feeders, drinkers, nest boxes and perch positions
+- final fan model and duct dimensions
+- exact ammonia sensor model and calibration procedure
+- final door actuator and end-stop arrangement
+- final GPIO map after enclosure and cable routing confirmation
+
+## 7. Safety note
+
+This project involves 230 V AC mains power, moving door hardware and environmental control. All installation and mains work must be carried out by a qualified electrician or competent person in accordance with local rules and standards.
+
+## 8. Acceptance gate
+
+The design is accepted for extension into production-grade commissioning after the following have been confirmed:
+
+- ventilation dimensioning and local fail-safe logic,
+- hardware selection and safe power distribution,
+- final sensor placement and calibration plan,
+- local control behavior without HA or MQTT,
+- key missing measurements and environmental assumptions.
+
+## 9. Next development steps
+
+Recommended next steps:
+
+1. final sensor selection and placement validation,
+2. final fan sizing and flow verification,
+3. real-world calibration of SHT31, SCD41 and NH₃ sensor,
+4. validation of door obstruction and end-stop logic,
+5. Home Assistant dashboard tuning,
+6. failure-mode testing and production startup checklist.
