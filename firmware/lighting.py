@@ -1,4 +1,6 @@
 # Lighting control for poultry welfare and local schedule maintenance.
+# The schedule is intentionally conservative and local-first: it keeps the daily
+# light cycle working without depending on Home Assistant.
 
 import utime
 
@@ -28,3 +30,11 @@ class LightingController:
         else:
             self.logger.info("Lighting off by schedule")
         return {"state": self.state}
+
+    def force_on(self):
+        self.manual_mode = True
+        self.state = "on"
+
+    def force_off(self):
+        self.manual_mode = False
+        self.state = "off"
