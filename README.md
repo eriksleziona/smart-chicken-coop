@@ -109,7 +109,19 @@ The design is accepted for extension into production-grade commissioning after t
 - local control behavior without HA or MQTT,
 - key missing measurements and environmental assumptions.
 
-## 9. Next development steps
+## 9. Final production-oriented direction
+
+The project is now intentionally aligned with a realistic product-grade path rather than a purely prototype-oriented proof of concept:
+
+- Local safety logic remains the primary control layer, with MQTT and Home Assistant as optional supervision.
+- Final commissioning is treated as a measured field-validation process, not a one-time software upload.
+- All 230 V AC work stays in the licensed electrician / competent-person domain.
+- Sensor thresholds, door timings and fan sizing are provisional until actual house measurements are captured.
+- The firmware is positioned as a stable baseline that can be hardened in stages with real-world calibration and fail-safe testing.
+
+This direction keeps the design honest: it is realistic for a small livestock automation project, safe by default, and straightforward to extend once the physical installation data is available.
+
+## 10. Next development steps
 
 Recommended next steps:
 

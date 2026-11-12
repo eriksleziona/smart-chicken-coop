@@ -9,6 +9,7 @@ from config import (
     I2C_SDA_PIN,
     I2C_SCL_PIN,
     FEED_LEVEL_PIN,
+    NH3_ANALOG_PIN,
     WATER_FLOW_PIN,
 )
 
@@ -67,6 +68,7 @@ class SensorManager:
         self.scd41.start_periodic_measurement()
 
         self.feed_adc = ADC(Pin(FEED_LEVEL_PIN, Pin.IN))
+        self.nh3_adc = ADC(Pin(NH3_ANALOG_PIN, Pin.IN))
         self.water_flow_pin = Pin(WATER_FLOW_PIN, Pin.IN, Pin.PULL_UP)
 
         self.temp_offset = 0.0
@@ -106,11 +108,11 @@ class SensorManager:
         return data
 
     def read_ammonia_ppm(self):
-        # Typical ammonia sensor strategy: analog output representing ppm via an
+        # Typical ammonia sensor strategy: analog output from a dedicated
         # electrochemical module. Calibration is required on site.
         # The final design must use the actual sensor transfer function and the exact
-        # sensor's output scaling from the datasheet.
-        adc_value = self.feed_adc.read()
+        # sensor's output scaling from its datasheet.
+        adc_value = self.nh3_adc.read()
         ppm = max(0, adc_value / 40.96)
         return max(0.0, ppm + self.ammonia_offset)
 

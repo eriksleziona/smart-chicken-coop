@@ -20,8 +20,10 @@ MQTT_KEEPALIVE_S = 60
 MQTT_RETRY_DELAY_S = 5
 
 # ESP32 GPIO assignments
-# These are realistic default mappings for a development board. Final pin allocation
-# must be validated during wiring and enclosure layout.
+# This is a more realistic baseline for a compact, practical build using a
+# standard ESP32 DevKit board. It is intentionally conservative and suitable for
+# a real installation review. Final verification still belongs to the person
+# performing the final enclosure and wiring work.
 I2C_SDA_PIN = 21
 I2C_SCL_PIN = 22
 
@@ -29,12 +31,13 @@ FAN_RELAY_PIN = 25
 LIGHT_RELAY_PIN = 26
 DOOR_MOTOR_OPEN_PIN = 32
 DOOR_MOTOR_CLOSE_PIN = 33
-DOOR_LIMIT_OPEN_PIN = 34
-DOOR_LIMIT_CLOSE_PIN = 35
-DOOR_POSITION_PIN = 36
-FEED_LEVEL_PIN = 27
+DOOR_LIMIT_OPEN_PIN = 4
+DOOR_LIMIT_CLOSE_PIN = 27
+DOOR_POSITION_PIN = 34
+FEED_LEVEL_PIN = 36
+NH3_ANALOG_PIN = 39
 WATER_FLOW_PIN = 14
-BUZZER_PIN = 4
+BUZZER_PIN = 15
 
 # Recommended provisional thresholds for the initial commissioning phase.
 # These are NOT final safety-critical values and must be tuned against real-world

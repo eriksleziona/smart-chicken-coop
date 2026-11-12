@@ -1,67 +1,62 @@
-# Preliminary ESP32 pin planning
+# ESP32 pin planning baseline
 
-This file provides only a preliminary planning template. Final pin assignment must be confirmed after wiring layout, sensor selection and enclosure design are finalized.
+This file defines a more realistic baseline pin allocation for the current build concept. It is intended to approach a practical installation layout rather than remain purely conceptual.
 
-## 1. Signal groups
+## 1. Design baseline
 
-### Power and debug
-- 3V3: sensor supply only where appropriate per chip datasheet
-- GND: common reference for digital and analog low-voltage logic
-- EN: reset or keep high according to design
-- GPIO0 / GPIO2 / GPIO4 / GPIO5: reserved or used only after careful review of boot and strapping status
-- UART0: reserved for programming and debug unless intentionally repurposed
+The current baseline assumes:
 
-### I²C sensors
-- SCL: GPIO assigned after final layout review
-- SDA: GPIO assigned after final layout review
-- Sensor supply and pull-up configuration according to module datasheet
+- ESP32 DevKit / WROOM-32 on a clean, stable breakout board
+- SHT31 and SCD41 on the I²C bus
+- dedicated analog ammonia channel
+- feed-level analog sensor on a separate ADC channel
+- door actuation with two motor outputs and limit switches
+- a local buzzer for alarm events
 
-### Digital inputs
-- door end-stop switches
-- obstacle detection input
-- feed-level sensor digital state
-- water-flow pulse input
-- general alarm input or maintenance switch
-
-### Digital outputs
-- ventilation relay / fan control output
-- lighting relay output
-- door motor drive logic
-- buzzer or local alarm output
-- local status LEDs
-
-### Analog inputs
-- optional analog sensor or 0–3.3 V measurement
-- calibration and filtering required
-
-## 2. Critical design rule
-
-Do not assign final pins until the actual board layout, sensor cable lengths and power-supply layout are known. Some pins are recommended for specific functions only after boot-state and strapping constraints are checked.
-
-## 3. High-level map
+## 2. Pin map
 
 ```text
-ESP32
-├── I²C bus: SHT31, SCD41, optional sensor hub
-├── UART: programming / debug
-├── GPIO: ventilation relay output
-├── GPIO: lighting relay output
-├── GPIO: door motor driver / direction logic
-├── GPIO: door position input
-├── GPIO: door end-stop inputs
-├── GPIO: feed-level input
-├── GPIO: water-flow pulse input
-├── GPIO: local alarm / buzzer
-├── ADC: optional analog input or sensor conditioning output
-└── GND / 3V3 power rails
+ESP32 GPIO 21  -> I2C SDA   (SHT31 / SCD41)
+ESP32 GPIO 22  -> I2C SCL   (SHT31 / SCD41)
+ESP32 GPIO 25  -> Vent fan relay / output
+ESP32 GPIO 26  -> Light relay / output
+ESP32 GPIO 32  -> Door motor OPEN
+ESP32 GPIO 33  -> Door motor CLOSE
+ESP32 GPIO 34  -> Door position / feedback input
+ESP32 GPIO 27  -> Door close limit input
+ESP32 GPIO 14  -> Water flow pulse input
+ESP32 GPIO 36  -> Feed level analog input (ADC)
+ESP32 GPIO 39  -> NH3 analog input (ADC)
+ESP32 GPIO 15  -> Local buzzer or alarm output
+ESP32 GND      -> common logic reference
+ESP32 3V3       -> regulator to low-voltage sensors as required
 ```
 
-## 4. Finalization requirements
+## 3. Notes on real-world use
 
-Before hardware build:
+- GPIO34 and GPIO39 are input-only analog-friendly channels on many ESP32 variants; verify the exact board details before final wiring.
+- GPIO14 is a useful pulse input for a water flow sensor, but the final wiring and signal conditioning should be verified against the chosen sensor output type.
+- Keep analog and digital sensor lines away from relay drivers and fan power wiring.
+- Use pull-ups or pull-downs only according to the device datasheet and final schematic.
 
-- confirm actual sensor module I²C addresses
-- confirm noise immunity for long sensor cables
-- verify pull-up resistors and voltage compatibility
-- confirm each output is protected for the actual load
-- ensure the relay / MOSFET stage is sized correctly for the load current
+## 4. Reserved or sensitive pins
+
+Avoid using the following for routine digital outputs unless required during final bench testing:
+
+- GPIO0
+- GPIO2
+- GPIO4 (used here for door open limit in a simpler direct-switch arrangement)
+- GPIO5
+- UART0 programming pins
+
+## 5. Final installation rules
+
+Before physical wiring is finalized:
+
+- confirm module compatibility with the exact ESP32 board revision,
+- confirm sensor cable lengths and available shielding,
+- verify actual signal polarity for limit and flow sensors,
+- confirm that all relay outputs are sized for the real loads,
+- re-check the final enclosure layout and wiring routing before energizing the system.
+
+This pinout is a realistic baseline and should be treated as a production-prep map, not as a guarantee for every PCB variant.
