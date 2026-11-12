@@ -77,6 +77,7 @@ The current implementation includes modules for:
 - [documentation/automation_logic.md](./documentation/automation_logic.md) – automation logic concept
 - [documentation/calibration.md](./documentation/calibration.md) – calibration workflow
 - [documentation/troubleshooting.md](./documentation/troubleshooting.md) – failure and service checks
+- [checklisty/](./checklisty) – printable installation and commissioning checklists
 - [firmware/README.md](./firmware/README.md) – MicroPython firmware overview
 - [home_assistant/mqtt_entities.yaml](./home_assistant/mqtt_entities.yaml) – MQTT topic and HA discovery template
 - [tests/](./tests) – validation plans for sensors, connectivity and failure modes
