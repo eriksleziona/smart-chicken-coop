@@ -1,4 +1,6 @@
 # Water flow monitoring and anomaly detection.
+# This module detects a dry or interrupted drinker line and suspiciously high flow
+# that may indicate a leak or failure in the watering system.
 
 import utime
 
@@ -36,3 +38,6 @@ class WaterMonitor:
             "no_flow": no_flow,
             "abnormal_high_flow": abnormal_high_flow,
         }
+
+    def reset_warning(self):
+        self.last_warning_time = 0

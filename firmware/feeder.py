@@ -1,4 +1,6 @@
 # Feed monitoring logic.
+# Measures local feed availability and raises an alert when the hopper becomes
+# critically low.
 
 from machine import Pin
 
@@ -23,3 +25,6 @@ class FeederMonitor:
             "level_pct": level_pct,
             "low_feed": low_feed,
         }
+
+    def reset_alert(self):
+        self.low_feed_alert_sent = False
