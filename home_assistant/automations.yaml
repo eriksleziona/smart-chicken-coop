@@ -1,0 +1,22 @@
+# Home Assistant automations skeleton
+# This file is intentionally minimal and meant to be refined after the architecture review.
+
+- alias: Chicken Coop high CO2 alert
+  triggers:
+    - trigger: numeric_state
+      entity_id: sensor.chicken_coop_co2
+      above: 0
+  actions:
+    - action: notify.notify
+      data:
+        message: "Chicken Coop CO2 high"
+
+- alias: Chicken Coop low feed alert
+  triggers:
+    - trigger: numeric_state
+      entity_id: sensor.chicken_coop_feeder_level
+      below: 0
+  actions:
+    - action: notify.notify
+      data:
+        message: "Chicken Coop feed level low"

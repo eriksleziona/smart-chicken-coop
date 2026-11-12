@@ -1,0 +1,55 @@
+# Home Assistant MQTT Discovery template
+# This file is intentionally a skeleton for architecture review. It is not final production configuration.
+
+mqtt:
+  binary_sensor:
+    - name: "Chicken Coop System Availability"
+      state_topic: "chicken_coop/system/availability"
+      payload_on: "online"
+      payload_off: "offline"
+      device_class: "connectivity"
+
+  sensor:
+    - name: "Chicken Coop Temperature"
+      state_topic: "chicken_coop/environment/temperature"
+      unit_of_measurement: "°C"
+      device_class: "temperature"
+
+    - name: "Chicken Coop Humidity"
+      state_topic: "chicken_coop/environment/humidity"
+      unit_of_measurement: "%"
+      device_class: "humidity"
+
+    - name: "Chicken Coop CO2"
+      state_topic: "chicken_coop/environment/co2"
+      unit_of_measurement: "ppm"
+      device_class: "carbon_dioxide"
+
+    - name: "Chicken Coop Ammonia"
+      state_topic: "chicken_coop/environment/ammonia"
+      unit_of_measurement: "ppm"
+
+    - name: "Chicken Coop Fan Speed"
+      state_topic: "chicken_coop/ventilation/speed"
+      unit_of_measurement: "%"
+
+    - name: "Chicken Coop Feeder Level"
+      state_topic: "chicken_coop/feeder/level"
+      unit_of_measurement: "%"
+
+    - name: "Chicken Coop Water Consumption"
+      state_topic: "chicken_coop/water/consumption"
+      unit_of_measurement: "L"
+
+  switch:
+    - name: "Chicken Coop Ventilation Manual Override"
+      command_topic: "chicken_coop/ventilation/command"
+      state_topic: "chicken_coop/ventilation/state"
+
+    - name: "Chicken Coop Lighting Manual"
+      command_topic: "chicken_coop/lighting/command"
+      state_topic: "chicken_coop/lighting/state"
+
+    - name: "Chicken Coop Door Control"
+      command_topic: "chicken_coop/door/command"
+      state_topic: "chicken_coop/door/state"
